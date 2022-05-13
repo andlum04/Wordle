@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Random;
-import java.util.StringTokenizer;
+import java.util.Scanner;
 
 public class Main {
 
@@ -17,7 +17,18 @@ public class Main {
             throw new RuntimeException(e);
         }
         setSolution();
-        System.out.println(solution);
+
+        Scanner sc = new Scanner(System.in);
+        while(true){
+            String guess = sc.nextLine();
+            try{
+                System.out.println("\033[1A\r" + genRule(guess));
+            } catch (StringIndexOutOfBoundsException e){
+                System.out.println("word must be length 5");
+
+            }
+
+        }
 
     }
 
@@ -27,7 +38,7 @@ public class Main {
             BufferedReader solutionsBR = new BufferedReader(new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream("/solutions.txt"))));
             String nextLine = solutionsBR.readLine();
             while(nextLine != null){
-                solutions.add(nextLine);
+                solutions.add(nextLine.toUpperCase());
                 nextLine = solutionsBR.readLine();
             }
 
@@ -56,6 +67,21 @@ public class Main {
             }
             n++;
         }
+    }
+
+    public static String genRule(String s){
+        s = s.toUpperCase();
+        StringBuilder rule = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+
+            if(solution.charAt(i) == s.charAt(i)) rule.append("\033[1;92m");
+            //TODO fix rules for duplicate letters
+            else if(solution.contains(String.valueOf(s.charAt(i)))) rule.append("\033[1;93m");
+            else rule.append("\033[0;1m");
+            rule.append(s.charAt(i));
+        }
+        rule.append("\033[0m");
+        return rule.toString();
     }
 
 
