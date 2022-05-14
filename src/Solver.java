@@ -24,10 +24,11 @@ public class Solver {
         possibleSolutions.addAll(solutions);
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Rules rules = new Rules();
-        while (possibleSolutions.size() > 1) {
+        // according to 3blue1brown, this is the best starting word after simulating
+        // the game for all words for the 250 top candidates
+        String best = "SALET";
+        while (true) {
             System.out.println("Possible solutions: " + possibleSolutions.size());
-            // get best word
-            String best = getBest();
             System.out.println("Best word: " + best);
             System.out.print("Enter guess result (ex: yybby): ");
             String validation = reader.readLine();
@@ -39,6 +40,9 @@ public class Solver {
             rules.addRule(best, validation);
             // filter our possible solutions
             possibleSolutions.removeIf(Predicate.not(rules::match));
+            if (possibleSolutions.size() == 1) break;
+            // get next best word
+            best = getBest();
         }
         System.out.println("Solution: " + possibleSolutions.get(0));
     }
