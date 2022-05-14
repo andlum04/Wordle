@@ -74,9 +74,9 @@ public class Main {
         StringBuilder rule = new StringBuilder();
         for (int i = 0; i < 5; i++) {
 
-            if(solution.charAt(i) == s.charAt(i)) rule.append("\033[1;92m");
+            if(solution.charAt(i) == s.charAt(i)) rule.append("\033[1;42m");
             //TODO fix rules for duplicate letters
-            else if(solution.contains(String.valueOf(s.charAt(i)))) rule.append("\033[1;93m");
+            else if(solution.contains(String.valueOf(s.charAt(i)))) rule.append("\033[1;43m");
             else rule.append("\033[0;1m");
             rule.append(s.charAt(i));
         }
