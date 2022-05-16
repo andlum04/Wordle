@@ -19,17 +19,15 @@ public class Main {
         setSolution();
 
         Scanner sc = new Scanner(System.in);
-        while(true){
-            String guess = sc.nextLine();
-            try{
+        for (int i = 0; i < 6; i++) {
+            String guess = sc.nextLine().toUpperCase();
+            if(guess.length() == 5 && (words.contains(guess) || solutions.contains(guess))){
                 System.out.println("\033[1A\r" + genRule(guess));
-            } catch (StringIndexOutOfBoundsException e){
-                System.out.println("word must be length 5");
-
+                if(guess.equals(solution)) return;
             }
-
+            else System.out.println("Invalid Guess");
         }
-
+        System.out.println(solution);
     }
 
 
@@ -45,7 +43,7 @@ public class Main {
             BufferedReader wordsBR = new BufferedReader(new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream("/words.txt"))));
             nextLine = wordsBR.readLine();
             while(nextLine != null){
-                words.add(nextLine);
+                words.add(nextLine.toUpperCase());
                 nextLine = wordsBR.readLine();
             }
 
@@ -69,19 +67,39 @@ public class Main {
         }
     }
 
-    public static String genRule(String s){
-        s = s.toUpperCase();
-        StringBuilder rule = new StringBuilder();
+    public static String genRule(String guess){
+        int[] charCount = new int[26];
+        guess = guess.toUpperCase();
+        String[] rule = new String[5];
+        
+        //check for green letters
         for (int i = 0; i < 5; i++) {
-
-            if(solution.charAt(i) == s.charAt(i)) rule.append("\033[1;42m");
-            //TODO fix rules for duplicate letters
-            else if(solution.contains(String.valueOf(s.charAt(i)))) rule.append("\033[1;43m");
-            else rule.append("\033[0;1m");
-            rule.append(s.charAt(i));
+            if(solution.charAt(i) == guess.charAt(i)){
+                rule[i] = "\033[1;92m" +  guess.charAt(i);
+                charCount[guess.charAt(i) - 65]++;
+            }
         }
-        rule.append("\033[0m");
-        return rule.toString();
+        //check for yellow letters
+        for (int i = 0; i < 5; i++) {
+            int currentCharCount = 0;
+                for(char c: solution.toCharArray()){
+                    if(c == guess.charAt(i)) currentCharCount++;
+                }
+                if(currentCharCount > charCount[guess.charAt(i) - 65]){
+                    rule[i] = "\033[1;33m" + guess.charAt(i);
+                    charCount[guess.charAt(i) - 65]++;
+                }
+        }
+        //remaining letters are black
+        for (int i = 0; i < 5; i++) {
+            if(rule[i] == null) rule[i] = "\033[0;1m" + guess.charAt(i);
+        }
+        
+        StringBuilder output = new StringBuilder();
+        for(String s : rule){
+            output.append(s);
+        }
+        return output.toString();
     }
 
 
