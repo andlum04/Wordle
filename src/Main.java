@@ -75,20 +75,20 @@ public class Main {
         //check for green letters
         for (int i = 0; i < 5; i++) {
             if(solution.charAt(i) == guess.charAt(i)){
-                rule[i] = "\033[1;42m" +  guess.charAt(i);
-                charCount[guess.charAt(i) - 65]++;
+                rule[i] = "\033[1;42m" + guess.charAt(i);
+            } else {
+                charCount[solution.charAt(i) - 'A']++;
             }
         }
         //check for yellow letters
         for (int i = 0; i < 5; i++) {
-            int currentCharCount = 0;
-                for(char c: solution.toCharArray()){
-                    if(c == guess.charAt(i)) currentCharCount++;
-                }
-                if(currentCharCount > charCount[guess.charAt(i) - 65]){
-                    rule[i] = "\033[1;43m" + guess.charAt(i);
-                    charCount[guess.charAt(i) - 65]++;
-                }
+            char sc = solution.charAt(i);
+            char gc = guess.charAt(i);
+            int idx = gc - 'A';
+            if (charCount[idx] != 0 && sc != gc) {
+                charCount[idx]--;
+                rule[i] = "\033[1;43m" + gc;
+            }
         }
         //remaining letters are black
         for (int i = 0; i < 5; i++) {
