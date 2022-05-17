@@ -6,16 +6,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Solver {
-    static ArrayList<String> words = new ArrayList<>();
+    static ArrayList<String> words;
     static ArrayList<String> solutions;
     static ArrayList<String> possibleSolutions = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         Main.readFiles();
         solutions = Main.solutions.stream().map(String::toUpperCase).collect(Collectors.toCollection(ArrayList::new));
-        // because they are all valid inputs
+        words = Main.words.stream().map(String::toUpperCase).collect(Collectors.toCollection(ArrayList::new));
+        // because solutions are also valid inputs
         words.addAll(solutions);
-        words.addAll(Main.words.stream().map(String::toUpperCase).toList());
         solve();
     }
 
@@ -28,14 +28,26 @@ public class Solver {
         // the game for all words for the 250 top candidates
         String best = "SALET";
         while (true) {
-            System.out.println("Possible solutions: " + possibleSolutions.size());
             System.out.println("Best word: " + best);
-            System.out.print("Enter guess result (ex: yybby): ");
-            String validation = reader.readLine();
-            while (validation.length() != 5 || !isValid(validation)) {
-                System.out.println("Can only have letters 'y', 'b', and 'g'");
+            System.out.println("Possible solutions: " + possibleSolutions.size());
+            // print a max number of 10 lines for the solutions
+            if (possibleSolutions.size() > 9) {
+                for (int i = 0; i < 9; i++) {
+                    String possibleSolution = possibleSolutions.get(i);
+                    System.out.println(" • " + possibleSolution + " (" + Main.genRule(possibleSolution, best) + ")");
+                }
+                System.out.println(" ...");
+            } else {
+                for (String solution : possibleSolutions) {
+                    System.out.println(" • " + solution + " (" + Main.genRule(solution, best) + ")");
+                }
+            }
+            String validation;
+            while (true) {
                 System.out.print("Enter guess result (ex: yybby): ");
                 validation = reader.readLine();
+                if (validation.length() == 5 && isValid(validation)) break;
+                System.out.println("Can only have letters 'y', 'b', and 'g'");
             }
             rules.addRule(best, validation);
             // filter our possible solutions

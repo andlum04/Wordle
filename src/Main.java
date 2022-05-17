@@ -67,7 +67,7 @@ public class Main {
         }
     }
 
-    public static String genRule(String guess){
+    public static String genRule(String solution, String guess){
         int[] charCount = new int[26];
         guess = guess.toUpperCase();
         String[] rule = new String[5];
@@ -75,7 +75,7 @@ public class Main {
         //check for green letters
         for (int i = 0; i < 5; i++) {
             if(solution.charAt(i) == guess.charAt(i)){
-                rule[i] = "\033[1;92m" +  guess.charAt(i);
+                rule[i] = "\033[1;42m" +  guess.charAt(i);
                 charCount[guess.charAt(i) - 65]++;
             }
         }
@@ -86,7 +86,7 @@ public class Main {
                     if(c == guess.charAt(i)) currentCharCount++;
                 }
                 if(currentCharCount > charCount[guess.charAt(i) - 65]){
-                    rule[i] = "\033[1;33m" + guess.charAt(i);
+                    rule[i] = "\033[1;43m" + guess.charAt(i);
                     charCount[guess.charAt(i) - 65]++;
                 }
         }
@@ -99,10 +99,13 @@ public class Main {
         for(String s : rule){
             output.append(s);
         }
+        output.append("\033[0m");
         return output.toString();
     }
 
-
+    public static String genRule(String guess) {
+        return genRule(solution, guess);
+    }
 
 
 }
