@@ -46,7 +46,7 @@ public class Solver {
             while (true) {
                 System.out.print("Enter guess result (ex: yybby): ");
                 validation = reader.readLine();
-                if (validation.length() == 5 && isValid(validation)) break;
+                if (validation.length() == 5 && Utility.isValid(validation)) break;
                 System.out.println("Can only have letters 'y', 'b', and 'g'");
             }
             rules.addRule(best, validation);
@@ -57,18 +57,6 @@ public class Solver {
             best = getBest();
         }
         System.out.println("Solution: " + possibleSolutions.get(0));
-    }
-
-    public static boolean isValid(String v) {
-        for (int i = 0; i < v.length(); i++) {
-            switch (v.charAt(i)) {
-                case 'y':
-                case 'b':
-                case 'g': continue;
-                default: return false;
-            }
-        }
-        return true;
     }
 
     static class Best {

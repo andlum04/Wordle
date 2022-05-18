@@ -31,4 +31,16 @@ public class Utility {
         }
         return greenResult + yellowResult;
     }
+
+    public static boolean isValid(String v) {
+        for (int i = 0; i < v.length(); i++) {
+            switch (v.charAt(i)) {
+                case 'y':
+                case 'b':
+                case 'g': continue;
+                default: return false;
+            }
+        }
+        return true;
+    }
 }
