@@ -1,4 +1,8 @@
 public class Utility {
+    public static final double BASE_2 = Math.log(2);
+    public static double log2(double x) {
+        return Math.log(x) / BASE_2;
+    }
     /**
      * Returns a unique index indicating how word2 matches word1
      * @param word1 the first word

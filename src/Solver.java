@@ -86,7 +86,7 @@ public class Solver {
             for (int num : map) {
                 if (num != 0) {
                     double prob = (double)num / size;
-                    bits -= Math.log(prob) * prob;
+                    bits -= Utility.log2(prob) * prob;
                 }
             }
             b.updateBest(guess, bits, isAnswer);

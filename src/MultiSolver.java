@@ -119,7 +119,7 @@ public class MultiSolver {
                 for (int num : map) {
                     if (num != 0) {
                         double prob = (double)num / possibleSolutions[i].size();
-                        bits -= Math.log(prob) * prob;
+                        bits -= Utility.log2(prob) * prob;
                     }
                 }
             }
