@@ -3,17 +3,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Solver {
-    static ArrayList<String> words;
-    static ArrayList<String> solutions;
+    static ArrayList<String> words = Main.words;
+    static ArrayList<String> solutions = Main.solutions;
     static ArrayList<String> possibleSolutions = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         Main.readFiles();
-        solutions = Main.solutions.stream().map(String::toUpperCase).collect(Collectors.toCollection(ArrayList::new));
-        words = Main.words.stream().map(String::toUpperCase).collect(Collectors.toCollection(ArrayList::new));
         // because solutions are also valid inputs
         words.addAll(solutions);
         solve();
