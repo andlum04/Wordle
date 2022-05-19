@@ -47,4 +47,9 @@ public class Utility {
         }
         return true;
     }
+
+    public static double normalPdf(double mean, double stdev, double x) {
+        double zScore = (x - mean) / stdev;
+        return 1 / (stdev * Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * zScore * zScore);
+    }
 }

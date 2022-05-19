@@ -1,17 +1,22 @@
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
+
+import javax.swing.*;
 
 public class Main {
 
     static ArrayList<String> solutions = new ArrayList<>();
     static String solution;
     static ArrayList<String> words = new ArrayList<>();
+    static HashSet<String> wordSet = new HashSet<>();
 
     public static void main(String[] args) {
         try {
@@ -19,19 +24,37 @@ public class Main {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        wordSet.addAll(words);
+        wordSet.addAll(solutions);
         setSolution();
+        initGUI();
+    }
 
+    public static void initGUI() {
+        SwingUtilities.invokeLater(() -> {
+            JFrame f = new JFrame();
+            JPanel panel = new WordlePanel();
+            f.setContentPane(panel);
+            f.pack();
+            f.setResizable(false);
+            f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            f.setVisible(true);
+            f.setTitle("Wordle (Java Swing Edition)");
+            panel.requestFocus();
+        });
+    }
+
+    public static void cliApp() {
         Scanner sc = new Scanner(System.in);
         for (int i = 0; i < 6; i++) {
             String guess = sc.nextLine().toUpperCase();
-            if (guess.length() == 5 && (words.contains(guess) || solutions.contains(guess))) {
+            if (guess.length() == 5 && (wordSet.contains(guess))) {
                 System.out.println("\033[1A\r" + genRule(guess));
                 if (guess.equals(solution)) return;
             } else System.out.println("Invalid Guess");
         }
         System.out.println(solution);
     }
-
 
     public static void readFiles() throws IOException {
         try (
