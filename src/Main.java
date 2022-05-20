@@ -1,8 +1,5 @@
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
@@ -28,6 +25,9 @@ public class Main {
         wordSet.addAll(solutions);
         setSolution();
         initGUI();
+
+
+
     }
 
     public static void initGUI() {

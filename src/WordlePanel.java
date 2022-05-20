@@ -2,11 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 
 public class WordlePanel extends JPanel implements KeyListener {
     final static LetterPane[][] panes = new LetterPane[6][5];
     int currentRow = 0;
     int currentCol = 0;
+
+
 
     public WordlePanel() {
         setBackground(Color.BLACK);
@@ -50,6 +53,11 @@ public class WordlePanel extends JPanel implements KeyListener {
                 int[] scratch = new int[26];
                 int color = Utility.getGroup(guess, Main.solution, scratch);
                 boolean isDone = color == 242;
+                try {
+                    Solver.solveOne(guess, color);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
                 for (int i = 4; i >= 0; i--) {
                     panes[currentRow][i].setCurrentState(color % 3);
                     color /= 3;
