@@ -12,25 +12,26 @@ public class LetterPane extends JComponent {
     private static final Color GRAY = new Color(0x3a3a3c);
     private static final Color LIGHT_GRAY = new Color(0x565758);
     private static final Color YELLOW = new Color(0xb59f3b);
-    private static final Font FONT = new Font("Arial", Font.BOLD, 40);
+    private static final Font FONT = new Font("Arial", Font.BOLD, 32);
 
-    private static final double INC = Math.PI / 12;
-    public enum State {
-        UNEVALUATED,
-        NONEXISTENT,
-        WRONG_PLACE,
-        CORRECT_PLACE,
-    }
+    private static final double INC = Math.PI / 24;
+
+    public static final int EFFECT_NONE = 0;
+    public static final int EFFECT_FLIP = 1;
+    public static final int EFFECT_SHAKE = 2;
+    public static final int EFFECT_RESIZE = 3;
+    public static final int EFFECT_JUMP = 4;
+    public static final int STATE_UNEVALUATED = 3;
+    public static final int STATE_NONEXISTENT = 0;
+    public static final int STATE_WRONG_PLACE = 1;
+    public static final int STATE_CORRECT_PLACE = 2;
 
     private char letter = ' ';
-    private State currentState = State.UNEVALUATED;
+    private int currentState = STATE_UNEVALUATED;
     private final BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
     private double transform = 0;
-    private boolean flipping = false;
+    private int effect;
     private LetterPane next;
-    private boolean shaking = false;
-    private boolean resizing = false;
-    private boolean jumping = false;
     private final Timer shakeTimer = new Timer(20, (e) -> {
         if (transform >= Math.PI * 12) {
             ((Timer) e.getSource()).stop();
@@ -43,12 +44,12 @@ public class LetterPane extends JComponent {
     private final Timer jump2 = new Timer(20, (e) -> {
         if (transform >= Math.PI * 2) {
             ((Timer) e.getSource()).stop();
-            jumping = false;
+            effect = EFFECT_NONE;
             transform = 0;
             repaint();
             return;
         }
-        transform += INC;
+        transform += INC * 2;
         repaint();
     });
 
@@ -60,16 +61,16 @@ public class LetterPane extends JComponent {
             jump2.start();
             return;
         }
-        transform += INC;
+        transform += INC * 2;
         repaint();
     });
 
     private final Timer secondFlip = new Timer(20, (e) -> {
-        if (transform >= Math.PI * 2) {
+        if (transform >= Math.PI) {
             // stop
             ((Timer)e.getSource()).stop();
             transform = 0;
-            flipping = false;
+            effect = EFFECT_NONE;
             return;
         }
         transform += INC;
@@ -77,7 +78,7 @@ public class LetterPane extends JComponent {
     });
 
     private final Timer startFlip = new Timer(20, (e) -> {
-        if (transform >= Math.PI) {
+        if (transform >= Math.PI / 2) {
             ((Timer)e.getSource()).stop();
             updateLetter();
             secondFlip.start();
@@ -90,7 +91,7 @@ public class LetterPane extends JComponent {
 
     private final Timer startResize = new Timer(20, (e) -> {
         if (transform >= 5) {
-            resizing = false;
+            effect = EFFECT_NONE;
             transform = 0;
             ((Timer) e.getSource()).stop();
             repaint();
@@ -110,20 +111,25 @@ public class LetterPane extends JComponent {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        if (flipping) {
-            double amount = (Math.cos(transform) + 1) / 2;
-            g2d.translate(0, HEIGHT * (1 - amount) / 2);
-            g2d.scale(1, amount);
-        } else if (shaking) {
-            double amount = Math.sin(transform) * Utility.normalPdf(Math.PI * 6, 6, transform) * 7;
-            g2d.translate(10 * amount, 0);
-        } else if (resizing) {
-            double amount = Utility.normalPdf(2.5, 1, transform);
-            g2d.translate(-WIDTH * amount / 2, -HEIGHT * amount / 2);
-            g2d.scale(1 + amount, 1 + amount);
-        } else if (jumping) {
-            double amount = -Math.sin(transform) * WIDTH / 4 - 0.3;
-            g2d.translate(0, amount);
+        switch (effect) {
+            case EFFECT_FLIP -> {
+                double amount = Math.abs(Math.cos(transform));
+                g2d.translate(0, HEIGHT * (1 - amount) / 2);
+                g2d.scale(1, amount);
+            }
+            case EFFECT_SHAKE -> {
+                double amount = Math.sin(transform) * Utility.normalPdf(Math.PI * 6, 6, transform) * 7;
+                g2d.translate(10 * amount, 0);
+            }
+            case EFFECT_RESIZE -> {
+                double amount = Utility.normalPdf(2.5, 1, transform);
+                g2d.translate(-WIDTH * amount / 2, -HEIGHT * amount / 2);
+                g2d.scale(1 + amount, 1 + amount);
+            }
+            case EFFECT_JUMP -> {
+                double amount = -Math.sin(transform) * WIDTH / 4 - 0.3;
+                g2d.translate(0, amount);
+            }
         }
         g2d.drawImage(img, MARGIN, MARGIN, null);
     }
@@ -132,7 +138,7 @@ public class LetterPane extends JComponent {
         Graphics2D g = img.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         switch (currentState) {
-            case UNEVALUATED -> {
+            case STATE_UNEVALUATED -> {
                 g.setColor(Color.BLACK);
                 g.fillRect(0, 0, WIDTH, HEIGHT);
                 if (letter == ' ') g.setColor(GRAY);
@@ -140,15 +146,15 @@ public class LetterPane extends JComponent {
                 g.setStroke(new BasicStroke(2));
                 g.drawRect(1, 1, WIDTH - 2, HEIGHT - 2);
             }
-            case NONEXISTENT -> {
+            case STATE_NONEXISTENT -> {
                 g.setColor(GRAY);
                 g.fillRect(0, 0, WIDTH, HEIGHT);
             }
-            case WRONG_PLACE -> {
+            case STATE_WRONG_PLACE -> {
                 g.setColor(YELLOW);
                 g.fillRect(0, 0, WIDTH, HEIGHT);
             }
-            case CORRECT_PLACE -> {
+            case STATE_CORRECT_PLACE -> {
                 g.setColor(GREEN);
                 g.fillRect(0, 0, WIDTH, HEIGHT);
             }
@@ -170,7 +176,7 @@ public class LetterPane extends JComponent {
         letter = l;
         updateLetter();
         if (letter != ' ') {
-            resizing = true;
+            effect = EFFECT_RESIZE;
             startResize.start();
         }
         else repaint();
@@ -180,12 +186,12 @@ public class LetterPane extends JComponent {
         return letter;
     }
 
-    public void setCurrentState(State s) {
+    public void setCurrentState(int s) {
         currentState = s;
     }
 
     public void flip() {
-        flipping = true;
+        effect = EFFECT_FLIP;
         startFlip.start();
     }
 
@@ -198,21 +204,21 @@ public class LetterPane extends JComponent {
     }
 
     private void doShake() {
-        shaking = true;
+        effect = EFFECT_SHAKE;
         transform += Math.PI / 3;
         repaint();
         if (next != null) next.doShake();
     }
 
     private void stopShake() {
-        shaking = false;
+        effect = EFFECT_NONE;
         repaint();
         transform = 0;
         if (next != null) next.stopShake();
     }
 
     public void startJump() {
-        jumping = true;
+        effect = EFFECT_JUMP;
         jump.start();
     }
 }

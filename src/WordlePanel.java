@@ -49,12 +49,7 @@ public class WordlePanel extends JPanel implements KeyListener {
                 int color = Utility.getGroup(guess, Main.solution, scratch);
                 boolean isDone = color == 242;
                 for (int i = 4; i >= 0; i--) {
-                    panes[currentRow][i].setCurrentState(switch (color % 3) {
-                        case 0 -> LetterPane.State.NONEXISTENT;
-                        case 1 -> LetterPane.State.WRONG_PLACE;
-                        case 2 -> LetterPane.State.CORRECT_PLACE;
-                        default -> throw new IllegalStateException("Unexpected value: " + color % 3);
-                    });
+                    panes[currentRow][i].setCurrentState(color % 3);
                     color /= 3;
                 }
                 panes[currentRow][0].flip();
@@ -66,6 +61,7 @@ public class WordlePanel extends JPanel implements KeyListener {
                     t.start();
                 } else if (currentRow == 5) {
                     removeKeyListener(this);
+                    JOptionPane.showMessageDialog(this, "Correct word: " + Main.solution, "Good Try!", JOptionPane.INFORMATION_MESSAGE);
                 }
                 currentRow++;
                 currentCol = 0;
