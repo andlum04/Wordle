@@ -10,10 +10,11 @@ public class WordlePanel extends JPanel implements KeyListener {
 
     public WordlePanel() {
         setBackground(Color.BLACK);
-        setLayout(new GridLayout(6, 5));
+        // I don't need a layout!
+        setLayout(null);
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 5; j++) {
-                panes[i][j] = new LetterPane();
+                panes[i][j] = new LetterPane(j, i);
                 add(panes[i][j]);
             }
         }
@@ -23,6 +24,7 @@ public class WordlePanel extends JPanel implements KeyListener {
             }
         }
         addKeyListener(this);
+        setPreferredSize(new Dimension(LetterPane.TOTAL_WIDTH * 5, LetterPane.TOTAL_HEIGHT * 6));
     }
 
     @Override
@@ -55,7 +57,13 @@ public class WordlePanel extends JPanel implements KeyListener {
                 panes[currentRow][0].flip();
                 int rowToJump = currentRow;
                 if (isDone) {
+                    // don't let user input anything further
                     removeKeyListener(this);
+                    for (int i = 0; i < 5; i++) {
+                        // move panes to front
+                        setComponentZOrder(panes[currentRow][i], 1);
+                    }
+                    // start jumping
                     Timer t = new Timer(1500, l -> panes[rowToJump][0].startJump());
                     t.setRepeats(false);
                     t.start();

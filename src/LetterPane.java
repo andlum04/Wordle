@@ -4,28 +4,30 @@ import java.awt.image.BufferedImage;
 
 public class LetterPane extends JComponent {
 
-    private static final int WIDTH = 62;
-    private static final int HEIGHT = 62;
+    public static final int WIDTH = 62;
+    public static final int HEIGHT = 62;
     private static final int MARGIN = 2;
-    private static final Dimension DIMENSION = new Dimension(WIDTH + 2 * MARGIN, HEIGHT + 2 * MARGIN);
+    public static final int TOTAL_WIDTH = WIDTH + 2 * MARGIN;
+    public static final int TOTAL_HEIGHT = HEIGHT + 2 * MARGIN;
     private static final Color GREEN = new Color(0x538d4e);
     private static final Color GRAY = new Color(0x3a3a3c);
     private static final Color LIGHT_GRAY = new Color(0x565758);
     private static final Color YELLOW = new Color(0xb59f3b);
     private static final Font FONT = new Font("Arial", Font.BOLD, 32);
 
-    private static final double INC = Math.PI / 24;
+    private static final double INC = Math.PI / 25;
 
     public static final int EFFECT_NONE = 0;
     public static final int EFFECT_FLIP = 1;
     public static final int EFFECT_SHAKE = 2;
     public static final int EFFECT_RESIZE = 3;
-    public static final int EFFECT_JUMP = 4;
     public static final int STATE_UNEVALUATED = 3;
     public static final int STATE_NONEXISTENT = 0;
     public static final int STATE_WRONG_PLACE = 1;
     public static final int STATE_CORRECT_PLACE = 2;
 
+    private final int x;
+    private final int y;
     private char letter = ' ';
     private int currentState = STATE_UNEVALUATED;
     private final BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
@@ -46,10 +48,12 @@ public class LetterPane extends JComponent {
             ((Timer) e.getSource()).stop();
             effect = EFFECT_NONE;
             transform = 0;
+            resetBounds();
             repaint();
             return;
         }
         transform += INC * 2;
+        jumpBounds();
         repaint();
     });
 
@@ -62,6 +66,7 @@ public class LetterPane extends JComponent {
             return;
         }
         transform += INC * 2;
+        jumpBounds();
         repaint();
     });
 
@@ -101,10 +106,19 @@ public class LetterPane extends JComponent {
         repaint();
     });
 
-    public LetterPane() {
-        setPreferredSize(DIMENSION);
-        setMinimumSize(DIMENSION);
+    public LetterPane(int x, int y) {
+        this.x = x * TOTAL_WIDTH;
+        this.y = y * TOTAL_HEIGHT;
+        setBounds(this.x, this.y, TOTAL_WIDTH, TOTAL_HEIGHT);
         updateLetter();
+    }
+
+    private void jumpBounds() {
+        setLocation(x, y - (int) Math.round((Math.sin(transform) + 0.3) * WIDTH / 3));
+    }
+
+    private void resetBounds() {
+        setLocation(x, y);
     }
 
     @Override
@@ -125,10 +139,6 @@ public class LetterPane extends JComponent {
                 double amount = Utility.normalPdf(2.5, 1, transform);
                 g2d.translate(-WIDTH * amount / 2, -HEIGHT * amount / 2);
                 g2d.scale(1 + amount, 1 + amount);
-            }
-            case EFFECT_JUMP -> {
-                double amount = -Math.sin(transform) * WIDTH / 4 - 0.3;
-                g2d.translate(0, amount);
             }
         }
         g2d.drawImage(img, MARGIN, MARGIN, null);
@@ -218,7 +228,6 @@ public class LetterPane extends JComponent {
     }
 
     public void startJump() {
-        effect = EFFECT_JUMP;
         jump.start();
     }
 }
