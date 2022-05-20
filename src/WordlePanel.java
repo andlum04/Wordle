@@ -10,7 +10,7 @@ public class WordlePanel extends JPanel implements KeyListener {
 
     public WordlePanel() {
         setBackground(Color.BLACK);
-        setLayout(new GridLayout(6, 5, 4, 4));
+        setLayout(new GridLayout(6, 5));
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 5; j++) {
                 panes[i][j] = new LetterPane();
@@ -47,6 +47,7 @@ public class WordlePanel extends JPanel implements KeyListener {
                 // evaluate word
                 int[] scratch = new int[26];
                 int color = Utility.getGroup(guess, Main.solution, scratch);
+                boolean isDone = color == 242;
                 for (int i = 4; i >= 0; i--) {
                     panes[currentRow][i].setCurrentState(switch (color % 3) {
                         case 0 -> LetterPane.State.NONEXISTENT;
@@ -57,6 +58,15 @@ public class WordlePanel extends JPanel implements KeyListener {
                     color /= 3;
                 }
                 panes[currentRow][0].flip();
+                int rowToJump = currentRow;
+                if (isDone) {
+                    removeKeyListener(this);
+                    Timer t = new Timer(1500, l -> panes[rowToJump][0].startJump());
+                    t.setRepeats(false);
+                    t.start();
+                } else if (currentRow == 5) {
+                    removeKeyListener(this);
+                }
                 currentRow++;
                 currentCol = 0;
             } else {
