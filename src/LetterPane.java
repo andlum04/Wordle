@@ -6,17 +6,6 @@ public class LetterPane extends JComponent {
 
     public static final int WIDTH = 62;
     public static final int HEIGHT = 62;
-    private static final int MARGIN = 2;
-    public static final int TOTAL_WIDTH = WIDTH + 2 * MARGIN;
-    public static final int TOTAL_HEIGHT = HEIGHT + 2 * MARGIN;
-    private static final Color GREEN = new Color(0x538d4e);
-    private static final Color GRAY = new Color(0x3a3a3c);
-    private static final Color LIGHT_GRAY = new Color(0x565758);
-    private static final Color YELLOW = new Color(0xb59f3b);
-    private static final Font FONT = new Font("Arial", Font.BOLD, 32);
-
-    private static final double INC = Math.PI / 25;
-
     public static final int EFFECT_NONE = 0;
     public static final int EFFECT_FLIP = 1;
     public static final int EFFECT_SHAKE = 2;
@@ -25,75 +14,68 @@ public class LetterPane extends JComponent {
     public static final int STATE_NONEXISTENT = 0;
     public static final int STATE_WRONG_PLACE = 1;
     public static final int STATE_CORRECT_PLACE = 2;
-
+    private static final int MARGIN = 2;
+    public static final int TOTAL_WIDTH = WIDTH + 2 * MARGIN;
+    public static final int TOTAL_HEIGHT = HEIGHT + 2 * MARGIN;
+    private static final Color GREEN = new Color(0x538d4e);
+    private static final Color GRAY = new Color(0x3a3a3c);
+    private static final Color LIGHT_GRAY = new Color(0x565758);
+    private static final Color YELLOW = new Color(0xb59f3b);
+    private static final Font FONT = new Font("Arial", Font.BOLD, 32);
+    private static final double INC = Math.PI / 25;
     private final int x;
     private final int y;
+    private final BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
     private char letter = ' ';
     private int currentState = STATE_UNEVALUATED;
-    private final BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
     private double transform = 0;
-    private int effect;
     private LetterPane next;
-    private final Timer shakeTimer = new Timer(20, (e) -> {
-        if (transform >= Math.PI * 12) {
-            ((Timer) e.getSource()).stop();
-            stopShake();
-            return;
-        }
-        doShake();
-    });
-
     private final Timer jump2 = new Timer(20, (e) -> {
-        if (transform >= Math.PI * 2) {
+        if (transform >= 1) {
             ((Timer) e.getSource()).stop();
-            effect = EFFECT_NONE;
             transform = 0;
             resetBounds();
             repaint();
             return;
         }
-        transform += INC * 2;
+        transform += 0.05;
         jumpBounds();
         repaint();
     });
-
     private final Timer jump = new Timer(20, (e) -> {
-        if (transform >= Math.PI / 2) {
+        transform += 0.05;
+        jumpBounds();
+        repaint();
+        if (transform >= 0.25) {
             // stop
             ((Timer) e.getSource()).stop();
             if (next != null) next.startJump();
             jump2.start();
-            return;
         }
-        transform += INC * 2;
-        jumpBounds();
-        repaint();
     });
-
+    private int effect;
     private final Timer secondFlip = new Timer(20, (e) -> {
         if (transform >= Math.PI) {
             // stop
-            ((Timer)e.getSource()).stop();
+            ((Timer) e.getSource()).stop();
             transform = 0;
             effect = EFFECT_NONE;
+            repaint();
             return;
         }
         transform += INC;
         repaint();
     });
-
     private final Timer startFlip = new Timer(20, (e) -> {
+        transform += INC;
+        repaint();
         if (transform >= Math.PI / 2) {
-            ((Timer)e.getSource()).stop();
+            ((Timer) e.getSource()).stop();
             updateLetter();
             secondFlip.start();
             if (next != null) next.flip();
-            return;
         }
-        transform += INC;
-        repaint();
     });
-
     private final Timer startResize = new Timer(20, (e) -> {
         if (transform >= 5) {
             effect = EFFECT_NONE;
@@ -105,16 +87,29 @@ public class LetterPane extends JComponent {
         transform += 1;
         repaint();
     });
+    private final Timer shakeTimer = new Timer(20, (e) -> {
+        if (transform >= Math.PI * 12) {
+            ((Timer) e.getSource()).stop();
+            stopShake();
+            return;
+        }
+        doShake();
+    });
 
     public LetterPane(int x, int y) {
         this.x = x * TOTAL_WIDTH;
         this.y = y * TOTAL_HEIGHT;
         setBounds(this.x, this.y, TOTAL_WIDTH, TOTAL_HEIGHT);
         updateLetter();
+        jump.setCoalesce(false);
+        jump2.setCoalesce(false);
+        startResize.setCoalesce(false);
+        shakeTimer.setCoalesce(false);
+        startFlip.setCoalesce(false);
     }
 
     private void jumpBounds() {
-        setLocation(x, y - (int) Math.round((Math.sin(transform) + 0.3) * WIDTH / 3));
+        setLocation(x, y - (int) Math.round(Math.exp(-25 * transform * transform + 25 * transform - 6.25) * (-3 * transform + 1.8) * HEIGHT));
     }
 
     private void resetBounds() {
@@ -182,18 +177,17 @@ public class LetterPane extends JComponent {
         g.drawString(text, x, y);
     }
 
+    public char getLetter() {
+        return letter;
+    }
+
     public void setLetter(char l) {
         letter = l;
         updateLetter();
         if (letter != ' ') {
             effect = EFFECT_RESIZE;
             startResize.start();
-        }
-        else repaint();
-    }
-
-    public char getLetter() {
-        return letter;
+        } else repaint();
     }
 
     public void setCurrentState(int s) {
