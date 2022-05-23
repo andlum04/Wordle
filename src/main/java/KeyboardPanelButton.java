@@ -33,6 +33,7 @@ public class KeyboardPanelButton extends JButton {
         setBorderPainted(false);
         setPreferredSize(new Dimension(width, HEIGHT));
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        setFocusable(false);
     }
 
     public void setColor(int color) {

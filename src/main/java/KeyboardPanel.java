@@ -15,6 +15,15 @@ public class KeyboardPanel extends JPanel {
         wordlePanel.setKeyboardPanel(this);
     }
 
+    public void reset() {
+        removeAll();
+        addFirstRow();
+        addSecondRow();
+        addThirdRow();
+        revalidate();
+        repaint();
+    }
+
     private void addFirstRow() {
         char[] row = {'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'};
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 4));

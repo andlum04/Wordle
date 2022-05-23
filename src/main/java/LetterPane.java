@@ -14,7 +14,7 @@ public class LetterPane extends JComponent {
     public static final int STATE_NONEXISTENT = 0;
     public static final int STATE_WRONG_PLACE = 1;
     public static final int STATE_CORRECT_PLACE = 2;
-    private static final int MARGIN = 2;
+    private static final int MARGIN = 3;
     public static final int TOTAL_WIDTH = WIDTH + 2 * MARGIN;
     public static final int TOTAL_HEIGHT = HEIGHT + 2 * MARGIN;
     private static final Color GREEN = new Color(0x538d4e);
@@ -39,12 +39,12 @@ public class LetterPane extends JComponent {
             repaint();
             return;
         }
-        transform = (double) (System.currentTimeMillis() - start) / 20 * 0.05;
+        transform = (double) (System.currentTimeMillis() - start) / 20 * 0.04;
         jumpBounds();
         repaint();
     });
     private final Timer jump = new Timer(20, (e) -> {
-        transform = (double) (System.currentTimeMillis() - start) / 20 * 0.05;
+        transform = (double) (System.currentTimeMillis() - start) / 20 * 0.04;
         jumpBounds();
         repaint();
         if (transform >= 0.25) {
@@ -99,7 +99,7 @@ public class LetterPane extends JComponent {
 
     public LetterPane(int x, int y) {
         this.x = x * TOTAL_WIDTH;
-        this.y = y * TOTAL_HEIGHT;
+        this.y = y * TOTAL_HEIGHT + 30;
         setBounds(this.x, this.y, TOTAL_WIDTH, TOTAL_HEIGHT);
         updateLetter();
     }

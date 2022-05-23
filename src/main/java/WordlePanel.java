@@ -4,9 +4,24 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class WordlePanel extends JPanel implements KeyListener {
+    private static final String COMMAND;
+    private static final int CTRL_KEYCODE;
+    static {
+         if (System.getProperty("os.name").equals("Mac OS X")) {
+             // Mac users like to use command key
+             COMMAND = "⌘";
+             CTRL_KEYCODE = KeyEvent.VK_META;
+         } else {
+             // windows/linux/etc
+             COMMAND = "ctrl";
+             CTRL_KEYCODE = KeyEvent.VK_CONTROL;
+         }
+    }
     private final LetterPane[][] panes = new LetterPane[6][5];
     private int currentRow = 0;
     private int currentCol = 0;
+    private boolean disabled = false;
+    private boolean controlPressed = false;
 
     private KeyboardPanel keyboardPanel;
 
@@ -26,7 +41,27 @@ public class WordlePanel extends JPanel implements KeyListener {
             }
         }
         addKeyListener(this);
-        setPreferredSize(new Dimension(LetterPane.TOTAL_WIDTH * 5, LetterPane.TOTAL_HEIGHT * 6 + 15));
+        setPreferredSize(new Dimension(LetterPane.TOTAL_WIDTH * 5, LetterPane.TOTAL_HEIGHT * 6 + 45));
+    }
+
+    public void reset() {
+        removeAll();
+        disabled = false;
+        currentRow = 0;
+        currentCol = 0;
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 5; j++) {
+                panes[i][j] = new LetterPane(j, i);
+                add(panes[i][j]);
+            }
+        }
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 4; j++) {
+                panes[i][j].setNext(panes[i][j+1]);
+            }
+        }
+        revalidate();
+        repaint();
     }
 
     @Override
@@ -36,21 +71,31 @@ public class WordlePanel extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+        if (controlPressed && e.getKeyChar() == 'r') {
+            // reset when control-r is pressed
+            Main.setSolution();
+            reset();
+            keyboardPanel.reset();
+        } else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
             deleteChar();
         } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
             enter();
         } else if (Character.isLetter(e.getKeyChar())) {
             addChar(Character.toUpperCase(e.getKeyChar()));
+        } else if (e.getKeyCode() == CTRL_KEYCODE) {
+            controlPressed = true;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        if (e.getKeyCode() == CTRL_KEYCODE) {
+            controlPressed = false;
+        }
     }
 
     public void addChar(char c) {
+        if (disabled) return;
         if (currentCol != 5) {
             panes[currentRow][currentCol].setLetter(c);
             currentCol++;
@@ -58,6 +103,7 @@ public class WordlePanel extends JPanel implements KeyListener {
     }
 
     public void deleteChar() {
+        if (disabled) return;
         if (currentCol != 0) {
             currentCol--;
             panes[currentRow][currentCol].setLetter(' ');
@@ -65,6 +111,7 @@ public class WordlePanel extends JPanel implements KeyListener {
     }
 
     public void enter() {
+        if (disabled) return;
         StringBuilder sb = new StringBuilder();
         for (LetterPane lp : panes[currentRow]) {
             sb.append(lp.getLetter());
@@ -85,7 +132,7 @@ public class WordlePanel extends JPanel implements KeyListener {
             int rowToJump = currentRow;
             if (isDone) {
                 // don't let user input anything further
-                removeKeyListener(this);
+                disabled = true;
                 for (int i = 0; i < 5; i++) {
                     // move panes to front
                     setComponentZOrder(panes[currentRow][i], 1);
@@ -94,9 +141,24 @@ public class WordlePanel extends JPanel implements KeyListener {
                 Timer t = new Timer(1500, l -> panes[rowToJump][0].startJump());
                 t.setRepeats(false);
                 t.start();
+                Timer t2 = new Timer(2500, l -> {
+                    JOptionPane.showMessageDialog(this,
+                                "Congrats! Press " + COMMAND + "-r to restart",
+                                "Congratulations",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    requestFocus();
+                });
+                t2.setRepeats(false);
+                t2.start();
             } else if (currentRow == 5) {
-                removeKeyListener(this);
-                Timer t = new Timer(1500, l -> JOptionPane.showMessageDialog(this, "Correct word: " + Main.solution, "Good Try!", JOptionPane.INFORMATION_MESSAGE));
+                disabled = true;
+                Timer t = new Timer(1500, l -> {
+                    JOptionPane.showMessageDialog(this,
+                                "Correct word: " + Main.solution + "\nPress " + COMMAND + "-r to restart",
+                                "Good Try!",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    requestFocus();
+                });
                 t.setRepeats(false);
                 t.start();
             }
