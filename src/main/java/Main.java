@@ -33,14 +33,46 @@ public class Main {
     public static void initGUI() {
         SwingUtilities.invokeLater(() -> {
             JFrame f = new JFrame();
-            JPanel panel = new WordlePanel();
+
+            JPanel panel = (JPanel) f.getContentPane();
+            panel.setBackground(Color.BLACK);
+            panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
+            JLabel title = new JLabel("Wordle", SwingConstants.CENTER);
+            title.setAlignmentX(Component.CENTER_ALIGNMENT);
+            title.setFont(new Font("Courier", Font.BOLD, 40));
+            title.setForeground(Color.WHITE);
+            panel.add(title);
+
+            JSeparator separator = new JSeparator();
+            separator.setForeground(Color.GRAY);
+            panel.add(separator);
+
+            panel.add(Box.createVerticalGlue());
+
+            WordlePanel wordlePanel = new WordlePanel();
+            // cannot center align, so used another JPanel
+            JPanel temp = new JPanel();
+            temp.setBackground(Color.BLACK);
+            temp.add(wordlePanel);
+            panel.add(temp);
+
+            panel.add(Box.createVerticalGlue());
+
+            KeyboardPanel keyboardPanel = new KeyboardPanel(wordlePanel);
+            // cannot center align, so used another JPanel
+            temp = new JPanel();
+            temp.setBackground(Color.BLACK);
+            temp.add(keyboardPanel);
+            panel.add(temp);
+
             f.setContentPane(panel);
             f.pack();
             f.setResizable(false);
             f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             f.setVisible(true);
             f.setTitle("Wordle (Java Swing Edition)");
-            panel.requestFocus();
+            wordlePanel.requestFocus();
         });
     }
 

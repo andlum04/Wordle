@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * To solve multiple words at once, such as quordle or octordle
  */
 public class MultiSolver {
-    public static final int NUM_WORDS = 4;
+    public static final int NUM_WORDS = 8;
     @SuppressWarnings("unchecked")
     private static final ArrayList<String>[] possibleSolutions = new ArrayList[NUM_WORDS];
     /**
