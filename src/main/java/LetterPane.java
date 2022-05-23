@@ -30,6 +30,7 @@ public class LetterPane extends JComponent {
     private int currentState = STATE_UNEVALUATED;
     private double transform = 0;
     private LetterPane next;
+    private long start;
     private final Timer jump2 = new Timer(20, (e) -> {
         if (transform >= 1) {
             ((Timer) e.getSource()).stop();
@@ -38,12 +39,12 @@ public class LetterPane extends JComponent {
             repaint();
             return;
         }
-        transform += 0.05;
+        transform = (double) (System.currentTimeMillis() - start) / 20 * 0.05;
         jumpBounds();
         repaint();
     });
     private final Timer jump = new Timer(20, (e) -> {
-        transform += 0.05;
+        transform = (double) (System.currentTimeMillis() - start) / 20 * 0.05;
         jumpBounds();
         repaint();
         if (transform >= 0.25) {
@@ -63,11 +64,11 @@ public class LetterPane extends JComponent {
             repaint();
             return;
         }
-        transform += INC;
+        transform = (double) (System.currentTimeMillis() - start) / 20 * INC;
         repaint();
     });
     private final Timer startFlip = new Timer(20, (e) -> {
-        transform += INC;
+        transform = (double) (System.currentTimeMillis() - start) / 20 * INC;
         repaint();
         if (transform >= Math.PI / 2) {
             ((Timer) e.getSource()).stop();
@@ -84,7 +85,7 @@ public class LetterPane extends JComponent {
             repaint();
             return;
         }
-        transform += 1;
+        transform = (double) (System.currentTimeMillis() - start) / 20;
         repaint();
     });
     private final Timer shakeTimer = new Timer(20, (e) -> {
@@ -93,7 +94,7 @@ public class LetterPane extends JComponent {
             stopShake();
             return;
         }
-        doShake();
+        doShake(System.currentTimeMillis() - start);
     });
 
     public LetterPane(int x, int y) {
@@ -101,11 +102,6 @@ public class LetterPane extends JComponent {
         this.y = y * TOTAL_HEIGHT;
         setBounds(this.x, this.y, TOTAL_WIDTH, TOTAL_HEIGHT);
         updateLetter();
-        jump.setCoalesce(false);
-        jump2.setCoalesce(false);
-        startResize.setCoalesce(false);
-        shakeTimer.setCoalesce(false);
-        startFlip.setCoalesce(false);
     }
 
     private void jumpBounds() {
@@ -186,6 +182,7 @@ public class LetterPane extends JComponent {
         updateLetter();
         if (letter != ' ') {
             effect = EFFECT_RESIZE;
+            start = System.currentTimeMillis();
             startResize.start();
         } else repaint();
     }
@@ -196,6 +193,7 @@ public class LetterPane extends JComponent {
 
     public void flip() {
         effect = EFFECT_FLIP;
+        start = System.currentTimeMillis();
         startFlip.start();
     }
 
@@ -204,14 +202,15 @@ public class LetterPane extends JComponent {
     }
 
     public void shake() {
+        start = System.currentTimeMillis();
         shakeTimer.start();
     }
 
-    private void doShake() {
+    private void doShake(long time) {
         effect = EFFECT_SHAKE;
-        transform += Math.PI / 3;
+        transform = (double) time / 20 * Math.PI / 3;
         repaint();
-        if (next != null) next.doShake();
+        if (next != null) next.doShake(time);
     }
 
     private void stopShake() {
@@ -222,6 +221,7 @@ public class LetterPane extends JComponent {
     }
 
     public void startJump() {
+        start = System.currentTimeMillis();
         jump.start();
     }
 }
