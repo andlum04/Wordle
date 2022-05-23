@@ -69,7 +69,9 @@ public class WordlePanel extends JPanel implements KeyListener {
                     t.start();
                 } else if (currentRow == 5) {
                     removeKeyListener(this);
-                    JOptionPane.showMessageDialog(this, "Correct word: " + Main.solution, "Good Try!", JOptionPane.INFORMATION_MESSAGE);
+                    Timer t = new Timer(1500, l -> JOptionPane.showMessageDialog(this, "Correct word: " + Main.solution, "Good Try!", JOptionPane.INFORMATION_MESSAGE));
+                    t.setRepeats(false);
+                    t.start();
                 }
                 currentRow++;
                 currentCol = 0;
