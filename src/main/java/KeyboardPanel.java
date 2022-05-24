@@ -16,12 +16,9 @@ public class KeyboardPanel extends JPanel {
     }
 
     public void reset() {
-        removeAll();
-        addFirstRow();
-        addSecondRow();
-        addThirdRow();
-        revalidate();
-        repaint();
+        for (KeyboardPanelButton button : letters) {
+            button.reset();
+        }
     }
 
     private void addFirstRow() {

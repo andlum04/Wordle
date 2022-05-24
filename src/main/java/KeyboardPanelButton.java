@@ -63,4 +63,9 @@ public class KeyboardPanelButton extends JButton {
         g.setFont(FONT);
         g.drawString(text, x, y);
     }
+
+    public void reset() {
+        color = LIGHT_GRAY;
+        repaint();
+    }
 }

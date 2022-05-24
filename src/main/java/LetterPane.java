@@ -224,4 +224,11 @@ public class LetterPane extends JComponent {
         start = System.currentTimeMillis();
         jump.start();
     }
+
+    public void reset() {
+        letter = ' ';
+        currentState = STATE_UNEVALUATED;
+        updateLetter();
+        repaint();
+    }
 }

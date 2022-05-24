@@ -45,23 +45,14 @@ public class WordlePanel extends JPanel implements KeyListener {
     }
 
     public void reset() {
-        removeAll();
         disabled = false;
         currentRow = 0;
         currentCol = 0;
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 5; j++) {
-                panes[i][j] = new LetterPane(j, i);
-                add(panes[i][j]);
+                panes[i][j].reset();
             }
         }
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 4; j++) {
-                panes[i][j].setNext(panes[i][j+1]);
-            }
-        }
-        revalidate();
-        repaint();
     }
 
     @Override
