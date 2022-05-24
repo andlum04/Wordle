@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public class LetterPane extends JComponent {
 
@@ -25,9 +24,9 @@ public class LetterPane extends JComponent {
     private static final double INC = Math.PI / 25;
     private final int x;
     private final int y;
-    private final BufferedImage img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
     private char letter = ' ';
     private int currentState = STATE_UNEVALUATED;
+    private int newState;
     private double transform = 0;
     private LetterPane next;
     private long start;
@@ -72,7 +71,7 @@ public class LetterPane extends JComponent {
         repaint();
         if (transform >= Math.PI / 2) {
             ((Timer) e.getSource()).stop();
-            updateLetter();
+            currentState = newState;
             secondFlip.start();
             if (next != null) next.flip();
         }
@@ -101,7 +100,6 @@ public class LetterPane extends JComponent {
         this.x = x * TOTAL_WIDTH;
         this.y = y * TOTAL_HEIGHT + 30;
         setBounds(this.x, this.y, TOTAL_WIDTH, TOTAL_HEIGHT);
-        updateLetter();
     }
 
     private void jumpBounds() {
@@ -116,6 +114,8 @@ public class LetterPane extends JComponent {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.translate(MARGIN, MARGIN);
         switch (effect) {
             case EFFECT_FLIP -> {
                 double amount = Math.abs(Math.cos(transform));
@@ -132,35 +132,29 @@ public class LetterPane extends JComponent {
                 g2d.scale(1 + amount, 1 + amount);
             }
         }
-        g2d.drawImage(img, MARGIN, MARGIN, null);
-    }
-
-    private void updateLetter() {
-        Graphics2D g = img.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         switch (currentState) {
             case STATE_UNEVALUATED -> {
-                g.setColor(Color.BLACK);
-                g.fillRect(0, 0, WIDTH, HEIGHT);
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(0, 0, WIDTH, HEIGHT);
                 if (letter == ' ') g.setColor(GRAY);
-                else g.setColor(LIGHT_GRAY);
-                g.setStroke(new BasicStroke(2));
-                g.drawRect(1, 1, WIDTH - 2, HEIGHT - 2);
+                else g2d.setColor(LIGHT_GRAY);
+                g2d.setStroke(new BasicStroke(2));
+                g2d.drawRect(1, 1, WIDTH - 2, HEIGHT - 2);
             }
             case STATE_NONEXISTENT -> {
-                g.setColor(GRAY);
-                g.fillRect(0, 0, WIDTH, HEIGHT);
+                g2d.setColor(GRAY);
+                g2d.fillRect(0, 0, WIDTH, HEIGHT);
             }
             case STATE_WRONG_PLACE -> {
-                g.setColor(YELLOW);
-                g.fillRect(0, 0, WIDTH, HEIGHT);
+                g2d.setColor(YELLOW);
+                g2d.fillRect(0, 0, WIDTH, HEIGHT);
             }
             case STATE_CORRECT_PLACE -> {
-                g.setColor(GREEN);
-                g.fillRect(0, 0, WIDTH, HEIGHT);
+                g2d.setColor(GREEN);
+                g2d.fillRect(0, 0, WIDTH, HEIGHT);
             }
         }
-        FontMetrics metrics = g.getFontMetrics(FONT);
+        FontMetrics metrics = g2d.getFontMetrics(FONT);
         String text = String.valueOf(letter);
         // Determine the X coordinate for the text
         int x = (WIDTH - metrics.stringWidth(text)) / 2;
@@ -169,7 +163,6 @@ public class LetterPane extends JComponent {
         // Set the font
         g.setColor(Color.WHITE);
         g.setFont(FONT);
-        //System.out.println("Drew letter: " + letter);
         g.drawString(text, x, y);
     }
 
@@ -179,7 +172,6 @@ public class LetterPane extends JComponent {
 
     public void setLetter(char l) {
         letter = l;
-        updateLetter();
         if (letter != ' ') {
             effect = EFFECT_RESIZE;
             start = System.currentTimeMillis();
@@ -188,7 +180,7 @@ public class LetterPane extends JComponent {
     }
 
     public void setCurrentState(int s) {
-        currentState = s;
+        newState = s;
     }
 
     public void flip() {
@@ -228,7 +220,5 @@ public class LetterPane extends JComponent {
     public void reset() {
         letter = ' ';
         currentState = STATE_UNEVALUATED;
-        updateLetter();
-        repaint();
     }
 }

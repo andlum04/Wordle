@@ -66,6 +66,5 @@ public class KeyboardPanelButton extends JButton {
 
     public void reset() {
         color = LIGHT_GRAY;
-        repaint();
     }
 }

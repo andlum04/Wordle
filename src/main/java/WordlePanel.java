@@ -53,6 +53,7 @@ public class WordlePanel extends JPanel implements KeyListener {
                 panes[i][j].reset();
             }
         }
+        repaint();
     }
 
     @Override

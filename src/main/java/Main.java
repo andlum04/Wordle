@@ -45,7 +45,7 @@ public class Main {
             panel.add(title);
 
             JSeparator separator = new JSeparator();
-            separator.setForeground(Color.GRAY);
+            separator.setForeground(new Color(0x3a3a3c));
             panel.add(separator);
 
             panel.add(Box.createVerticalGlue());
