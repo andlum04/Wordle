@@ -134,8 +134,6 @@ public class LetterPane extends JComponent {
         }
         switch (currentState) {
             case STATE_UNEVALUATED -> {
-                g2d.setColor(Color.BLACK);
-                g2d.fillRect(0, 0, WIDTH, HEIGHT);
                 if (letter == ' ') g.setColor(GRAY);
                 else g2d.setColor(LIGHT_GRAY);
                 g2d.setStroke(new BasicStroke(2));

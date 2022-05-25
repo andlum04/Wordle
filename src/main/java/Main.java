@@ -1,3 +1,6 @@
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
+
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -31,11 +34,23 @@ public class Main {
     }
 
     public static void initGUI() {
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+            // dark title bar on macOS
+            //   - "system": use current macOS appearance (light or dark)
+            //   - "NSAppearanceNameAqua": use light appearance
+            //   - "NSAppearanceNameDarkAqua": use dark appearance
+            System.setProperty( "apple.awt.application.appearance", "NSAppearanceNameDarkAqua" );
+        } else if (System.getProperty("os.name").equals("Linux")) {
+            // decorate title bar on linux
+            JFrame.setDefaultLookAndFeelDecorated( true );
+            JDialog.setDefaultLookAndFeelDecorated( true );
+        }
         SwingUtilities.invokeLater(() -> {
+            FlatLaf.registerCustomDefaultsSource( "themes");
+            FlatDarkLaf.setup();
             JFrame f = new JFrame();
 
             JPanel panel = (JPanel) f.getContentPane();
-            panel.setBackground(Color.BLACK);
             panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
             JLabel title = new JLabel("Wordle", SwingConstants.CENTER);
@@ -53,7 +68,6 @@ public class Main {
             WordlePanel wordlePanel = new WordlePanel();
             // cannot center align, so used another JPanel
             JPanel temp = new JPanel();
-            temp.setBackground(Color.BLACK);
             temp.add(wordlePanel);
             panel.add(temp);
 
@@ -62,7 +76,6 @@ public class Main {
             KeyboardPanel keyboardPanel = new KeyboardPanel(wordlePanel);
             // cannot center align, so used another JPanel
             temp = new JPanel();
-            temp.setBackground(Color.BLACK);
             temp.add(keyboardPanel);
             panel.add(temp);
 

@@ -6,7 +6,6 @@ public class KeyboardPanel extends JPanel {
     private final WordlePanel wordlePanel;
     private final KeyboardPanelButton[] letters = new KeyboardPanelButton[26];
     public KeyboardPanel(WordlePanel wordlePanel) {
-        setBackground(Color.BLACK);
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         addFirstRow();
         addSecondRow();
@@ -25,7 +24,6 @@ public class KeyboardPanel extends JPanel {
     private void addFirstRow() {
         char[] row = {'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'};
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 4));
-        panel.setBackground(Color.BLACK);
         for (char key : row) {
             KeyboardPanelButton button = new KeyboardPanelButton(key, k -> keyPressed(key));
             letters[key - 'A'] = button;
@@ -37,7 +35,6 @@ public class KeyboardPanel extends JPanel {
     private void addSecondRow() {
         char[] row = {'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'};
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 4));
-        panel.setBackground(Color.BLACK);
         for (char key : row) {
             KeyboardPanelButton button = new KeyboardPanelButton(key, k -> keyPressed(key));
             letters[key - 'A'] = button;
@@ -49,7 +46,6 @@ public class KeyboardPanel extends JPanel {
     private void addThirdRow() {
         char[] row = {'Z', 'X', 'C', 'V', 'B', 'N', 'M'};
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 4));
-        panel.setBackground(Color.BLACK);
         // enter key
         panel.add(new KeyboardPanelButton("ENTER", l -> enterKey(), 65));
         for (char key : row) {

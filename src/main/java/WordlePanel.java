@@ -26,7 +26,6 @@ public class WordlePanel extends JPanel implements KeyListener {
     private KeyboardPanel keyboardPanel;
 
     public WordlePanel() {
-        setBackground(Color.BLACK);
         // I don't need a layout!
         setLayout(null);
         for (int i = 0; i < 6; i++) {
@@ -135,9 +134,9 @@ public class WordlePanel extends JPanel implements KeyListener {
                 t.start();
                 Timer t2 = new Timer(2500, l -> {
                     JOptionPane.showMessageDialog(this,
-                                "Congrats! Press " + COMMAND + "-r to restart",
+                                "Congrats! Press " + COMMAND + "-R to restart",
                                 "Congratulations",
-                                JOptionPane.INFORMATION_MESSAGE);
+                                JOptionPane.PLAIN_MESSAGE);
                     requestFocus();
                 });
                 t2.setRepeats(false);
@@ -146,9 +145,9 @@ public class WordlePanel extends JPanel implements KeyListener {
                 disabled = true;
                 Timer t = new Timer(1500, l -> {
                     JOptionPane.showMessageDialog(this,
-                                "Correct word: " + Main.solution + "\nPress " + COMMAND + "-r to restart",
+                                "Correct word: " + Main.solution + ". Press " + COMMAND + "-R to restart",
                                 "Good Try!",
-                                JOptionPane.INFORMATION_MESSAGE);
+                                JOptionPane.PLAIN_MESSAGE);
                     requestFocus();
                 });
                 t.setRepeats(false);
