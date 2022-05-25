@@ -8,16 +8,6 @@ public class Rules {
     private final boolean[] isExact = new boolean[26];
     private final int[] tempCounts = new int[26];
 
-    public Rules(String rule) {
-        addRule(rule);
-    }
-
-    public Rules(String... rules) {
-        for (String rule : rules) {
-            addRule(rule);
-        }
-    }
-
     public void addRule(String rule) {
         for (int i = 0; i < 5; i++) {
             // reset counts
