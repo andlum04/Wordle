@@ -30,7 +30,7 @@ public class LetterPane extends JComponent {
     private double transform = 0;
     private LetterPane next;
     private long start;
-    private final Timer jump2 = new Timer(20, (e) -> {
+    private final Timer jump2 = new Timer(17, (e) -> {
         if (transform >= 1) {
             ((Timer) e.getSource()).stop();
             transform = 0;
@@ -42,7 +42,7 @@ public class LetterPane extends JComponent {
         jumpBounds();
         repaint();
     });
-    private final Timer jump = new Timer(20, (e) -> {
+    private final Timer jump = new Timer(17, (e) -> {
         transform = (double) (System.currentTimeMillis() - start) / 20 * 0.04;
         jumpBounds();
         repaint();
@@ -54,7 +54,7 @@ public class LetterPane extends JComponent {
         }
     });
     private int effect;
-    private final Timer secondFlip = new Timer(20, (e) -> {
+    private final Timer secondFlip = new Timer(17, (e) -> {
         if (transform >= Math.PI) {
             // stop
             ((Timer) e.getSource()).stop();
@@ -66,7 +66,7 @@ public class LetterPane extends JComponent {
         transform = (double) (System.currentTimeMillis() - start) / 20 * INC;
         repaint();
     });
-    private final Timer startFlip = new Timer(20, (e) -> {
+    private final Timer startFlip = new Timer(17, (e) -> {
         transform = (double) (System.currentTimeMillis() - start) / 20 * INC;
         repaint();
         if (transform >= Math.PI / 2) {
@@ -76,7 +76,7 @@ public class LetterPane extends JComponent {
             if (next != null) next.flip();
         }
     });
-    private final Timer startResize = new Timer(20, (e) -> {
+    private final Timer startResize = new Timer(17, (e) -> {
         if (transform >= 5) {
             effect = EFFECT_NONE;
             transform = 0;
@@ -87,7 +87,7 @@ public class LetterPane extends JComponent {
         transform = (double) (System.currentTimeMillis() - start) / 20;
         repaint();
     });
-    private final Timer shakeTimer = new Timer(20, (e) -> {
+    private final Timer shakeTimer = new Timer(17, (e) -> {
         if (transform >= Math.PI * 12) {
             ((Timer) e.getSource()).stop();
             stopShake();
@@ -179,6 +179,21 @@ public class LetterPane extends JComponent {
 
     public void setCurrentState(int s) {
         newState = s;
+    }
+
+    /**
+     * Sets the minimum state that the letter could be in. This means that if the current state is green, it cannot
+     * become yellow or black, and if the current state is yellow, it cannot be set to black through this method.
+     * However, if the current state is STATE_UNEVALUATED, then it can be set to black, yellow, or green.
+     * If s is smaller than the current state, then nothing will happen.
+     * <p>
+     * The reason that we do this is so that if the second occurrence of a letter is black, but it was previously
+     * green, then it stays green.
+     *
+     * @param s the minimum state
+     */
+    public void setMinimumState(int s) {
+        newState = (newState & ~(newState >>> 1)) | s;
     }
 
     public void flip() {

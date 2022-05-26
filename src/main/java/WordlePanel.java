@@ -13,7 +13,7 @@ public class WordlePanel extends JPanel implements KeyListener {
              CTRL_KEYCODE = KeyEvent.VK_META;
          } else {
              // windows/linux/etc
-             COMMAND = "ctrl";
+             COMMAND = "CTRL";
              CTRL_KEYCODE = KeyEvent.VK_CONTROL;
          }
     }
@@ -62,7 +62,7 @@ public class WordlePanel extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (controlPressed && e.getKeyChar() == 'r') {
+        if (controlPressed && e.getKeyCode() == KeyEvent.VK_R) {
             // reset when control-r is pressed
             Main.setSolution();
             reset();
@@ -115,7 +115,7 @@ public class WordlePanel extends JPanel implements KeyListener {
             boolean isDone = colors == 242;
             for (int i = 4; i >= 0; i--) {
                 int color = colors % 3;
-                panes[currentRow][i].setCurrentState(color);
+                panes[currentRow][i].setMinimumState(color);
                 keyboardPanel.setColor(panes[currentRow][i].getLetter(), color);
                 colors /= 3;
             }
