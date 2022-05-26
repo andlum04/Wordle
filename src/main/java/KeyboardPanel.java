@@ -70,8 +70,5 @@ public class KeyboardPanel extends JPanel {
 
     public void setColor(char key, int color) {
         letters[key - 'A'].setColor(color);
-        Timer timer = new Timer(1500, l -> repaint());
-        timer.setRepeats(false);
-        timer.start();
     }
 }

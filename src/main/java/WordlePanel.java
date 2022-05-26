@@ -113,12 +113,23 @@ public class WordlePanel extends JPanel implements KeyListener {
             int[] scratch = new int[26];
             int colors = Utility.getGroup(guess, Main.solution, scratch);
             boolean isDone = colors == 242;
+            int[] keyColor = new int[26];
             for (int i = 4; i >= 0; i--) {
                 int color = colors % 3;
-                panes[currentRow][i].setMinimumState(color);
-                keyboardPanel.setColor(panes[currentRow][i].getLetter(), color);
+                panes[currentRow][i].setCurrentState(color);
+                int idx = guess.charAt(i) - 'A';
+                keyColor[idx] = Math.max(keyColor[idx], color);
                 colors /= 3;
             }
+            // set color for keyboard
+            for (int i = 0; i < 5; i++) {
+                int idx = guess.charAt(i) - 'A';
+                keyboardPanel.setColor(guess.charAt(i), keyColor[idx]);
+            }
+            // repaint keyboard after 1.5 seconds
+            Timer timer = new Timer(1500, l -> keyboardPanel.repaint());
+            timer.setRepeats(false);
+            timer.start();
             panes[currentRow][0].flip();
             int rowToJump = currentRow;
             if (isDone) {

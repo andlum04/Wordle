@@ -181,21 +181,6 @@ public class LetterPane extends JComponent {
         newState = s;
     }
 
-    /**
-     * Sets the minimum state that the letter could be in. This means that if the current state is green, it cannot
-     * become yellow or black, and if the current state is yellow, it cannot be set to black through this method.
-     * However, if the current state is STATE_UNEVALUATED, then it can be set to black, yellow, or green.
-     * If s is smaller than the current state, then nothing will happen.
-     * <p>
-     * The reason that we do this is so that if the second occurrence of a letter is black, but it was previously
-     * green, then it stays green.
-     *
-     * @param s the minimum state
-     */
-    public void setMinimumState(int s) {
-        newState = (newState & ~(newState >>> 1)) | s;
-    }
-
     public void flip() {
         effect = EFFECT_FLIP;
         start = System.currentTimeMillis();
