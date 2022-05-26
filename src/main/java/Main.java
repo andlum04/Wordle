@@ -55,7 +55,7 @@ public class Main {
 
             JLabel title = new JLabel("Wordle", SwingConstants.CENTER);
             title.setAlignmentX(Component.CENTER_ALIGNMENT);
-            title.setFont(new Font("Courier", Font.BOLD, 40));
+            title.setFont(new Font("Courier New", Font.BOLD, 40));
             title.setForeground(Color.WHITE);
             panel.add(title);
 
