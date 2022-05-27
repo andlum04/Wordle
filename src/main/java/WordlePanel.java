@@ -50,6 +50,7 @@ public class WordlePanel extends JPanel implements KeyListener {
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 5; j++) {
                 panes[i][j].reset();
+                setComponentZOrder(panes[i][j], 0);
             }
         }
         repaint();
