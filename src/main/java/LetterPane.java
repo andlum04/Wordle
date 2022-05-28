@@ -30,6 +30,7 @@ public class LetterPane extends JComponent {
     private int currentState = STATE_UNEVALUATED;
     private int newState;
     private double transform = 0;
+    private boolean clickingEnabled = false;
     private LetterPane next;
     private long start;
     private final Timer jump2 = new Timer(17, (e) -> {
@@ -245,6 +246,7 @@ public class LetterPane extends JComponent {
     }
 
     public void enableClicking() {
+        clickingEnabled = true;
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -253,6 +255,7 @@ public class LetterPane extends JComponent {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                if (!clickingEnabled) return;
                 currentState = switch (currentState) {
                     case STATE_NONEXISTENT -> STATE_WRONG_PLACE;
                     case STATE_WRONG_PLACE -> STATE_CORRECT_PLACE;
@@ -278,5 +281,13 @@ public class LetterPane extends JComponent {
 
             }
         });
+    }
+
+    public void reEnableClicking() {
+        clickingEnabled = true;
+    }
+
+    public void disableClicking() {
+        clickingEnabled = false;
     }
 }

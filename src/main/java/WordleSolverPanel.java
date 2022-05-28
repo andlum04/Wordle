@@ -25,6 +25,7 @@ public class WordleSolverPanel extends WordlePanel {
         int[] keyColor = new int[26];
         for (int i = 0; i < 5; i++) {
             rule *= 3;
+            panes[currentRow][i].disableClicking();
             int color = panes[currentRow][i].getState();
             rule += color;
             int idx = guess.charAt(i) - 'A';
@@ -77,6 +78,7 @@ public class WordleSolverPanel extends WordlePanel {
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 5; j++) {
                 panes[i][j].reset();
+                panes[i][j].reEnableClicking();
             }
         }
         keyboardPanel.reset();
