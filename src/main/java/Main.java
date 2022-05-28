@@ -13,6 +13,8 @@ import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class Main {
 
@@ -49,37 +51,80 @@ public class Main {
             FlatLaf.registerCustomDefaultsSource( "themes");
             FlatDarkLaf.setup();
             JFrame f = new JFrame();
-
             JPanel panel = (JPanel) f.getContentPane();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+            panel.setLayout(new BorderLayout());
+            JTabbedPane tabs = new JTabbedPane();
+            tabs.setFocusable(false);
+            panel.add(tabs, BorderLayout.CENTER);
+
+            final Font titleFont = new Font("Courier New", Font.BOLD, 40);
+
+            //
+            // the game panel
+            //
+            JPanel gamePanel = new JPanel();
+            gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.PAGE_AXIS));
 
             JLabel title = new JLabel("Wordle", SwingConstants.CENTER);
             title.setAlignmentX(Component.CENTER_ALIGNMENT);
-            title.setFont(new Font("Courier New", Font.BOLD, 40));
+            title.setFont(titleFont);
             title.setForeground(Color.WHITE);
-            panel.add(title);
+            gamePanel.add(title);
 
-            JSeparator separator = new JSeparator();
-            separator.setForeground(new Color(0x3a3a3c));
-            panel.add(separator);
+            gamePanel.add(new JSeparator());
 
-            panel.add(Box.createVerticalGlue());
+            gamePanel.add(Box.createVerticalGlue());
 
             WordlePanel wordlePanel = new WordlePanel();
             // cannot center align, so used another JPanel
             JPanel temp = new JPanel();
             temp.add(wordlePanel);
-            panel.add(temp);
+            gamePanel.add(temp);
 
-            panel.add(Box.createVerticalGlue());
+            gamePanel.add(Box.createVerticalGlue());
 
             KeyboardPanel keyboardPanel = new KeyboardPanel(wordlePanel);
             // cannot center align, so used another JPanel
             temp = new JPanel();
             temp.add(keyboardPanel);
-            panel.add(temp);
+            gamePanel.add(temp);
+            tabs.addTab("Game", gamePanel);
 
-            f.setContentPane(panel);
+            //
+            // the solver panel
+            //
+            JPanel solverPanel = new JPanel();
+            solverPanel.setLayout(new BoxLayout(solverPanel, BoxLayout.PAGE_AXIS));
+
+            JLabel solverTitle = new JLabel("Wordle Solver");
+            solverTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+            solverTitle.setForeground(Color.WHITE);
+            solverTitle.setFont(titleFont);
+            solverPanel.add(solverTitle);
+
+            solverPanel.add(new JSeparator());
+            solverPanel.add(Box.createVerticalGlue());
+
+            JPanel middlePanel = new JPanel();
+            WordleSolverPanel wordleSolverPanel = new WordleSolverPanel();
+            middlePanel.add(wordleSolverPanel);
+            solverPanel.add(middlePanel);
+            solverPanel.add(Box.createVerticalGlue());
+
+            JPanel temp2 = new JPanel();
+            temp2.add(new KeyboardPanel(wordleSolverPanel));
+            solverPanel.add(temp2);
+
+            tabs.add("Solver", solverPanel);
+
+            tabs.addChangeListener(e -> {
+                if (tabs.getSelectedComponent() == gamePanel) {
+                    wordlePanel.requestFocus();
+                } else {
+                    wordleSolverPanel.requestFocus();
+                }
+            });
+
             f.pack();
             f.setResizable(false);
             f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

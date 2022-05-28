@@ -4,8 +4,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class WordlePanel extends JPanel implements KeyListener {
-    private static final String COMMAND;
-    private static final int CTRL_KEYCODE;
+    protected static final String COMMAND;
+    protected static final int CTRL_KEYCODE;
     static {
          if (System.getProperty("os.name").equals("Mac OS X")) {
              // Mac users like to use command key
@@ -17,13 +17,13 @@ public class WordlePanel extends JPanel implements KeyListener {
              CTRL_KEYCODE = KeyEvent.VK_CONTROL;
          }
     }
-    private final LetterPane[][] panes = new LetterPane[6][5];
-    private int currentRow = 0;
-    private int currentCol = 0;
-    private boolean disabled = false;
-    private boolean controlPressed = false;
+    protected final LetterPane[][] panes = new LetterPane[6][5];
+    protected int currentRow = 0;
+    protected int currentCol = 0;
+    protected boolean disabled = false;
+    protected boolean controlPressed = false;
 
-    private KeyboardPanel keyboardPanel;
+    protected KeyboardPanel keyboardPanel;
 
     public WordlePanel() {
         // I don't need a layout!
@@ -117,7 +117,7 @@ public class WordlePanel extends JPanel implements KeyListener {
             int[] keyColor = new int[26];
             for (int i = 4; i >= 0; i--) {
                 int color = colors % 3;
-                panes[currentRow][i].setCurrentState(color);
+                panes[currentRow][i].setNewState(color);
                 int idx = guess.charAt(i) - 'A';
                 keyColor[idx] = Math.max(keyColor[idx], color);
                 colors /= 3;

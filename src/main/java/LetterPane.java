@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class LetterPane extends JComponent {
 
@@ -177,8 +179,16 @@ public class LetterPane extends JComponent {
         } else repaint();
     }
 
-    public void setCurrentState(int s) {
+    /**
+     * To set the future state of the component. Flip should be called after this
+     * @param s the state
+     */
+    public void setNewState(int s) {
         newState = s;
+    }
+
+    public void setCurrentState(int s) {
+        currentState = s;
     }
 
     public void flip() {
@@ -218,5 +228,45 @@ public class LetterPane extends JComponent {
     public void reset() {
         letter = ' ';
         currentState = STATE_UNEVALUATED;
+    }
+
+    public int getState() {
+        return currentState;
+    }
+
+    public void enableClicking() {
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                currentState = switch (currentState) {
+                    case STATE_NONEXISTENT -> STATE_WRONG_PLACE;
+                    case STATE_WRONG_PLACE -> STATE_CORRECT_PLACE;
+                    case STATE_CORRECT_PLACE -> STATE_NONEXISTENT;
+                    // if it is unevaluated, it stays that way;
+                    default -> STATE_UNEVALUATED;
+                };
+                repaint();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
     }
 }
