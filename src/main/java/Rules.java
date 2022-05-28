@@ -34,11 +34,38 @@ public class Rules {
         }
     }
 
+
     /**
      * Adds a rule
      * @param word the word we just checked
      * @param match contains the letters 'g', 'y', and 'b' for validation
      */
+    public void addRule(String word, int match) {
+        for (int i = 0; i < 5; i++) {
+            tempCounts[word.charAt(i) - 'A'] = 0;
+        }
+        for (int i = 4; i >= 0; i--) {
+            char currentChar = word.charAt(i);
+            int idx = currentChar - 'A';
+            switch (match % 3) {
+                case 2 -> {
+                    positions[i] = currentChar;
+                    tempCounts[idx]++;
+                }
+                case 1 -> {
+                    nonPositions[i][idx] = true;
+                    tempCounts[idx]++;
+                }
+                case 0 -> isExact[idx] = true;
+            }
+            match /= 3;
+        }
+        for (int i = 0; i < 5; i++) {
+            int idx = word.charAt(i) - 'A';
+            counts[idx] = Math.max(counts[idx], tempCounts[idx]);
+        }
+    }
+
     public void addRule(String word, String match) {
         for (int i = 0; i < 5; i++) {
             tempCounts[word.charAt(i) - 'A'] = 0;
