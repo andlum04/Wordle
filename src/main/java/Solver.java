@@ -5,18 +5,17 @@ import java.util.ArrayList;
 import java.util.function.Predicate;
 
 public class Solver {
-    static ArrayList<String> words = Main.words;
-    static ArrayList<String> solutions = Main.solutions;
-    static ArrayList<String> possibleSolutions = new ArrayList<>();
+    static final ArrayList<String> words = new ArrayList<>(Main.words);
+    static final ArrayList<String> solutions = Main.solutions;
 
     static {
-        possibleSolutions.addAll(solutions);
+        // solutions are also valid inputs
+        words.addAll(solutions);
     }
+    static final ArrayList<String> possibleSolutions = new ArrayList<>(solutions);
 
     public static void main(String[] args) throws IOException {
         Main.readFiles();
-        // because solutions are also valid inputs
-        words.addAll(solutions);
         solve();
     }
 
@@ -64,8 +63,6 @@ public class Solver {
         String bestWord;
         double bestBits;
 
-        ArrayList<String> rankedWords;
-
         synchronized void updateBest(String word, double bits, boolean isAnswer) {
             if ((isAnswer && bits == bestBits) || bits > bestBits) {
                 bestBits = bits;
@@ -97,31 +94,13 @@ public class Solver {
         return b.bestWord;
     }
 
-    public static void solveOne(String word, int rule) throws IOException {
-        Rules rules = new Rules();
-        rules.addRule(word, rule);
-        // filter our possible solutions
-        possibleSolutions.removeIf(Predicate.not(rules::match));
-        if (possibleSolutions.size() == 1){
-            System.out.println("Solution: " + possibleSolutions.get(0));
-            return;
-        }
-        // get next best word
-        String best = getBest();
+    public static void filter(String word, int rule) {
+        int[] scratch = new int[26];
+        possibleSolutions.removeIf(possibleSolution -> Utility.getGroup(word, possibleSolution, scratch) != rule);
+    }
 
-        System.out.println("Best word: " + best);
-        System.out.println("Possible solutions: " + possibleSolutions.size());
-        // print a max number of 10 lines for the solutions
-        if (possibleSolutions.size() > 9) {
-            for (int i = 0; i < 9; i++) {
-                String possibleSolution = possibleSolutions.get(i);
-                System.out.println(" • " + possibleSolution + " (" + Main.genRule(possibleSolution, best) + ")");
-            }
-            System.out.println(" ...");
-        } else {
-            for (String solution : possibleSolutions) {
-                System.out.println(" • " + solution + " (" + Main.genRule(solution, best) + ")");
-            }
-        }
+    public static void reset() {
+        possibleSolutions.clear();
+        possibleSolutions.addAll(solutions);
     }
 }

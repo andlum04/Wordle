@@ -180,6 +180,16 @@ public class LetterPane extends JComponent {
     }
 
     /**
+     * Sets the letter, while also changing color to green. Note that this does not repaint because it is expected
+     * that the parent panel does it.
+     * @param l the letter
+     */
+    public void setCorrectLetter(char l) {
+        letter = l;
+        currentState = STATE_CORRECT_PLACE;
+    }
+
+    /**
      * To set the future state of the component. Flip should be called after this
      * @param s the state
      */

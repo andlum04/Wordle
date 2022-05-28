@@ -53,6 +53,8 @@ public class WordlePanel extends JPanel implements KeyListener {
                 setComponentZOrder(panes[i][j], 0);
             }
         }
+        Main.setSolution();
+        keyboardPanel.reset();
         repaint();
     }
 
@@ -65,9 +67,7 @@ public class WordlePanel extends JPanel implements KeyListener {
     public void keyPressed(KeyEvent e) {
         if (controlPressed && e.getKeyCode() == KeyEvent.VK_R) {
             // reset when control-r is pressed
-            Main.setSolution();
             reset();
-            keyboardPanel.reset();
         } else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
             deleteChar();
         } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -104,11 +104,7 @@ public class WordlePanel extends JPanel implements KeyListener {
 
     public void enter() {
         if (disabled) return;
-        StringBuilder sb = new StringBuilder();
-        for (LetterPane lp : panes[currentRow]) {
-            sb.append(lp.getLetter());
-        }
-        String guess = sb.toString();
+        String guess = getWord();
         if (Main.wordSet.contains(guess)) {
             // evaluate word
             int[] scratch = new int[26];
@@ -170,6 +166,14 @@ public class WordlePanel extends JPanel implements KeyListener {
         } else {
             panes[currentRow][0].shake();
         }
+    }
+
+    public String getWord() {
+        StringBuilder sb = new StringBuilder();
+        for (LetterPane lp : panes[currentRow]) {
+            sb.append(lp.getLetter());
+        }
+        return sb.toString();
     }
 
     public void setKeyboardPanel(KeyboardPanel keyboardPanel) {

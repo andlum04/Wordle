@@ -30,9 +30,6 @@ public class Main {
         wordSet.addAll(solutions);
         setSolution();
         initGUI();
-
-
-
     }
 
     public static void initGUI() {
@@ -108,6 +105,7 @@ public class Main {
             JPanel middlePanel = new JPanel();
             WordleSolverPanel wordleSolverPanel = new WordleSolverPanel();
             middlePanel.add(wordleSolverPanel);
+            middlePanel.add(new SolutionsPanel(wordleSolverPanel));
             solverPanel.add(middlePanel);
             solverPanel.add(Box.createVerticalGlue());
 
