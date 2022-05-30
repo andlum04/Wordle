@@ -117,8 +117,10 @@ public class Main {
 
             tabs.addChangeListener(e -> {
                 if (tabs.getSelectedComponent() == gamePanel) {
+                    wordleSolverPanel.releaseControl();
                     wordlePanel.requestFocus();
                 } else {
+                    wordlePanel.releaseControl();
                     wordleSolverPanel.requestFocus();
                 }
             });

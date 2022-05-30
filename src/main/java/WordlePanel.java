@@ -179,4 +179,11 @@ public class WordlePanel extends JPanel implements KeyListener {
     public void setKeyboardPanel(KeyboardPanel keyboardPanel) {
         this.keyboardPanel = keyboardPanel;
     }
+
+    /**
+     * Tells program to release the control key
+     */
+    public void releaseControl() {
+        controlPressed = false;
+    }
 }
