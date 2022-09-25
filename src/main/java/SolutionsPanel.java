@@ -68,7 +68,10 @@ public class SolutionsPanel extends JPanel {
                 SwingUtilities.invokeLater(() -> {
                     String solution = Solver.possibleSolutions.get(0);
                     possibleSolutionNumber.setText("1");
-                    wordleSolverPanel.writeSolution(solution);
+                    // write solution if user has not written it yet
+                    if (rule != 242) {
+                        wordleSolverPanel.writeSolution(solution);
+                    }
                     bestWord.setText(solution);
                     possibleWords.setText(solution);
                     JOptionPane.showMessageDialog(getRootPane(),
