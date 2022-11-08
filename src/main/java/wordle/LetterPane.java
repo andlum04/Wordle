@@ -275,12 +275,13 @@ public class LetterPane extends JComponent {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-
+                if (!clickingEnabled || currentState == STATE_UNEVALUATED) return;
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-
+                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
         });
     }
