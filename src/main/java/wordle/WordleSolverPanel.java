@@ -94,6 +94,7 @@ public class WordleSolverPanel extends WordlePanel {
     public void writeSolution(String solution) {
         for (int i = 0; i < 5; i++) {
             panes[currentRow][i].setCorrectLetter(solution.charAt(i));
+            panes[currentRow][i].disableClicking();
             // set color to green
             keyboardPanel.setColor(solution.charAt(i), 2);
         }
