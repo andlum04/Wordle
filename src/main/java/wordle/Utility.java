@@ -1,3 +1,5 @@
+package wordle;
+
 public class Utility {
     public static final double BASE_2 = Math.log(2);
     public static double log2(double x) {

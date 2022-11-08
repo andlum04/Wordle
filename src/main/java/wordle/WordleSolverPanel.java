@@ -1,3 +1,5 @@
+package wordle;
+
 import javax.swing.*;
 
 public class WordleSolverPanel extends WordlePanel {
