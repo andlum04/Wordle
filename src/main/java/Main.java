@@ -2,16 +2,12 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 
 import java.awt.*;
+import java.awt.font.TextAttribute;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 public class Main {
 
@@ -54,19 +50,22 @@ public class Main {
             tabs.setFocusable(false);
             panel.add(tabs, BorderLayout.CENTER);
 
-            final Font titleFont = new Font("Courier New", Font.BOLD, 40);
-
+            Font tempFont = new Font("Helvetica Nueue", Font.BOLD, 40);
+            Map<TextAttribute, Object> attributes = new HashMap<>();
+            attributes.put(TextAttribute.TRACKING, 0.08);
+            final Font titleFont = tempFont.deriveFont(attributes);
             //
             // the game panel
             //
             JPanel gamePanel = new JPanel();
             gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.PAGE_AXIS));
 
-            JLabel title = new JLabel("Wordle", SwingConstants.CENTER);
+            JLabel title = new JLabel("WORDLE", SwingConstants.CENTER);
             title.setAlignmentX(Component.CENTER_ALIGNMENT);
             title.setFont(titleFont);
             title.setForeground(Color.WHITE);
             gamePanel.add(title);
+            gamePanel.add(Box.createVerticalStrut(3));
 
             gamePanel.add(new JSeparator());
 
@@ -98,6 +97,7 @@ public class Main {
             solverTitle.setForeground(Color.WHITE);
             solverTitle.setFont(titleFont);
             solverPanel.add(solverTitle);
+            solverPanel.add(Box.createVerticalStrut(3));
 
             solverPanel.add(new JSeparator());
             solverPanel.add(Box.createVerticalGlue());
