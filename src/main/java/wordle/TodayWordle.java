@@ -19,7 +19,7 @@ public class TodayWordle {
 
     public static ArrayList<String> readWordle() throws IOException {
         ArrayList<String> result = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(TodayWordle.class.getResourceAsStream("solutions.txt"))))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(TodayWordle.class.getResourceAsStream("/solutions.txt"))))) {
             String line;
             while ((line = br.readLine()) != null) {
                 result.add(line);
