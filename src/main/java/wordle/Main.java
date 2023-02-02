@@ -6,6 +6,8 @@ import com.formdev.flatlaf.FlatLaf;
 import java.awt.*;
 import java.awt.font.TextAttribute;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -126,12 +128,25 @@ public class Main {
                     wordleSolverPanel.requestFocus();
                 }
             });
-
+            f.setTitle("Wordle (Java Swing Edition)");
+            // load icon
+            ImageIcon icon = new ImageIcon(Objects.requireNonNull(Main.class.getResource("/icon.png")));
+            f.setIconImage(icon.getImage());
+            // set apple icon
+            try {
+                Class taskbar = Class.forName("java.awt.Taskbar");
+                Method getTaskbar = taskbar.getDeclaredMethod("getTaskbar");
+                Object instance = getTaskbar.invoke(taskbar);
+                Method setIconImage = instance.getClass().getDeclaredMethod("setIconImage", Image.class);
+                setIconImage.invoke(instance, icon.getImage());
+            } catch (Exception e) {
+                // ignore
+            }
+            f.getRootPane().putClientProperty( "apple.awt.transparentTitleBar", true );
             f.pack();
             f.setResizable(false);
             f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             f.setVisible(true);
-            f.setTitle("Wordle (Java Swing Edition)");
             wordlePanel.requestFocus();
         });
     }
