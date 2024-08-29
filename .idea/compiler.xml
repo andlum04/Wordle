@@ -9,8 +9,5 @@
         <module name="Wordle" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="Wordle" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>

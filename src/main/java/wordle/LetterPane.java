@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.lang.reflect.Field;
 
 public class LetterPane extends JComponent {
 
@@ -26,6 +29,22 @@ public class LetterPane extends JComponent {
     private static final Color YELLOW = new Color(0xb59f3b);
     private static final Font FONT = new Font("Arial", Font.BOLD, 32);
     private static final double INC = Math.PI / 25;
+    private static final double CAM_DIST = 1000;
+    private static final double INPUT_SCALE = 1.2;
+    private static final int SCALE;
+    static {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice device = ge.getDefaultScreenDevice();
+        try {
+            Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            sun.misc.Unsafe unsafe = (sun.misc.Unsafe) unsafeField.get(null);
+            Field field = device.getClass().getDeclaredField("scale");
+            SCALE = unsafe.getInt(device, unsafe.objectFieldOffset(field));
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
     private final int x;
     private final int y;
     private char letter = ' ';
@@ -119,14 +138,56 @@ public class LetterPane extends JComponent {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2d.translate(MARGIN, MARGIN);
-        switch (effect) {
-            case EFFECT_FLIP -> {
-                double amount = Math.abs(Math.cos(transform));
-                g2d.translate(0, HEIGHT * (1 - amount) / 2);
-                g2d.scale(1, amount);
+        if (effect != EFFECT_FLIP) {
+            g2d.translate(MARGIN, MARGIN);
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            draw(g2d);
+            return;
+        }
+        // flip effect
+        BufferedImage img = new BufferedImage((int)(INPUT_SCALE*WIDTH*SCALE), (int)(INPUT_SCALE*HEIGHT*SCALE), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage outputImg = new BufferedImage(SCALE * TOTAL_WIDTH, SCALE * TOTAL_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D ig = img.createGraphics();
+        ig.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        ig.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        ig.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        ig.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        ig.scale(SCALE*INPUT_SCALE, SCALE*INPUT_SCALE);
+        draw(ig);
+        int[] inputBuffer = ((DataBufferInt)img.getRaster().getDataBuffer()).getData();
+        int[] outputBuffer = ((DataBufferInt)outputImg.getRaster().getDataBuffer()).getData();
+        double cosA = Math.abs(Math.cos(transform));
+        double sinA = Math.sin(transform);
+        for (int x = 0; x < img.getWidth(); x++) {
+            for (int y = 0; y < img.getHeight(); y++) {
+                double unscaledX = x / INPUT_SCALE;
+                double unscaledY = y / INPUT_SCALE;
+                double z = CAM_DIST * SCALE;
+                double zOffset = unscaledY * sinA;
+                if (transform < Math.PI / 2) {
+                    z += zOffset;
+                } else {
+                    z -= zOffset;
+                }
+                double factor = CAM_DIST * SCALE / z;
+                int newX = (int)(unscaledX * factor) + MARGIN*SCALE;
+                int newY = (int)((unscaledY * cosA + HEIGHT*SCALE * (1 - cosA) / 2) * factor) + MARGIN*SCALE;
+                if (newX >= 0 && newX < SCALE * TOTAL_WIDTH && newY >= 0 && newY < SCALE * TOTAL_HEIGHT) {
+                    outputBuffer[newX + newY * SCALE * TOTAL_WIDTH] = inputBuffer[x + y * img.getWidth()];
+                }
             }
+        }
+        g2d.drawImage(outputImg, 0, 0, TOTAL_WIDTH, TOTAL_HEIGHT, null);
+    }
+
+    private void draw(Graphics2D g2d) {
+        switch (effect) {
+            // Flip not defined here because it's not a simple linear transformation
+//            case EFFECT_FLIP -> {
+//                double amount = Math.abs(Math.cos(transform));
+//                g2d.translate(0, HEIGHT * (1 - amount) / 2);
+//                g2d.scale(1, amount);
+//            }
             case EFFECT_SHAKE -> {
                 double amount = Math.sin(transform) * Utility.normalPdf(Math.PI * 6, 6, transform) * 7;
                 g2d.translate(10 * amount, 0);
@@ -139,7 +200,7 @@ public class LetterPane extends JComponent {
         }
         switch (currentState) {
             case STATE_UNEVALUATED -> {
-                if (letter == ' ') g.setColor(GRAY);
+                if (letter == ' ') g2d.setColor(GRAY);
                 else g2d.setColor(LIGHT_GRAY);
                 g2d.setStroke(new BasicStroke(2));
                 g2d.drawRect(1, 1, WIDTH - 2, HEIGHT - 2);
@@ -164,9 +225,9 @@ public class LetterPane extends JComponent {
         // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
         int y = (HEIGHT - metrics.getHeight()) / 2 + metrics.getAscent();
         // Set the font
-        g.setColor(Color.WHITE);
-        g.setFont(FONT);
-        g.drawString(text, x, y);
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(FONT);
+        g2d.drawString(text, x, y);
     }
 
     public char getLetter() {
