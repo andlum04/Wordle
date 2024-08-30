@@ -160,8 +160,8 @@ public class LetterPane extends JComponent {
         double sinA = Math.sin(transform);
         for (int x = 0; x < img.getWidth(); x++) {
             for (int y = 0; y < img.getHeight(); y++) {
-                double unscaledX = x / INPUT_SCALE;
-                double unscaledY = y / INPUT_SCALE;
+                double unscaledX = x / INPUT_SCALE - WIDTH*SCALE/2.0;
+                double unscaledY = y / INPUT_SCALE - HEIGHT*SCALE/2.0;
                 double z = CAM_DIST * SCALE;
                 double zOffset = unscaledY * sinA;
                 if (transform < Math.PI / 2) {
@@ -170,8 +170,8 @@ public class LetterPane extends JComponent {
                     z -= zOffset;
                 }
                 double factor = CAM_DIST * SCALE / z;
-                int newX = (int)(unscaledX * factor) + MARGIN*SCALE;
-                int newY = (int)((unscaledY * cosA + HEIGHT*SCALE * (1 - cosA) / 2) * factor) + MARGIN*SCALE;
+                int newX = (int)(unscaledX * factor + (WIDTH / 2.0 + MARGIN) * SCALE);
+                int newY = (int)(unscaledY * cosA * factor + (HEIGHT / 2.0 + MARGIN) * SCALE);
                 if (newX >= 0 && newX < SCALE * TOTAL_WIDTH && newY >= 0 && newY < SCALE * TOTAL_HEIGHT) {
                     outputBuffer[newX + newY * SCALE * TOTAL_WIDTH] = inputBuffer[x + y * img.getWidth()];
                 }
